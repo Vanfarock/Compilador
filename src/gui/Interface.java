@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.Box;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JSplitPane;
@@ -90,9 +92,12 @@ public class Interface {
 		
 		HandlerAcoes handlerAcoes = new HandlerAcoes(barraStatus, log, editor);
 		
-		Menu menu = new Menu(handlerAcoes);
-		menu.popular();
-		framePrincipal.setJMenuBar(menu);		
+	    Menu menu = new Menu(handlerAcoes);
+	    JMenuBar popular = menu.popular();
+	    popular.add(Box.createRigidArea(new Dimension(80,20)));
+	    popular.setPreferredSize(new Dimension(80,20));
+	    
+		horizontalSplit.setLeftComponent(popular);
 	}
 
 	 public void keyTyped(KeyEvent e) {
