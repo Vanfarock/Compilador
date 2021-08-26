@@ -11,7 +11,6 @@ public class BarraStatus extends JTextArea {
 	public BarraStatus(Font fontePadrao, Color backgroundPadrao) {
 		setBackground(backgroundPadrao);
 		setFont(fontePadrao);
-		setText("Barra status");
 		setEditable(false);		
 	}
 	

@@ -1,12 +1,28 @@
 package gui;
 
+import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import java.awt.AWTException;
+import java.awt.Component;
 
 @SuppressWarnings("serial")
 public class HandlerAcoes {
@@ -59,7 +75,30 @@ public class HandlerAcoes {
 		return new AbstractAction() {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		        System.out.println("Abrir arquivo.");
+		    	FileFilter filter = new FileNameExtensionFilter("Arquivo de texto (.txt)","txt");
+		    	Component c = null;
+		        JFileChooser fc = new JFileChooser();
+		        fc.addChoosableFileFilter(filter);
+		        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		        
+		        int n = fc.showOpenDialog(c);
+		        File f = fc.getSelectedFile();
+		        
+		        if(n == JFileChooser.APPROVE_OPTION) {
+					String dados;
+					try {
+						dados = new String(Files.readAllBytes(f.toPath()));
+						editor.getEditorTexto().setText(dados);
+						log.limpar();
+				        barraStatus.setText(f.getPath());
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				} else{
+					
+				}
+		        	        
 		    }
 		};
 	}
@@ -68,7 +107,34 @@ public class HandlerAcoes {
 		return new AbstractAction() {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		    	System.out.println("Salvar arquivo.");
+		    	File f = new File(barraStatus.getText());
+		    	try {
+					PrintWriter pw = new PrintWriter(f);
+					pw.println(editor.getEditorTexto().getText());
+					pw.close();
+				} catch (FileNotFoundException e1) {
+					FileFilter filter = new FileNameExtensionFilter("Arquivo de texto (.txt)","txt");
+					JFileChooser fc = new JFileChooser(new File("C:\\"));
+					fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+					fc.addChoosableFileFilter(filter);
+					fc.setDialogTitle("Salvar Arquivo");
+					int save = fc.showSaveDialog(null);
+					if (save == JFileChooser.APPROVE_OPTION) {
+						String conteudo = editor.getConteudo();
+						f = fc.getSelectedFile();
+						try {
+							FileWriter fw = new FileWriter(f.getPath()+".txt");
+							fw.write(conteudo);
+							fw.flush();
+							fw.close();
+							barraStatus.setText(f.getPath());
+							log.limpar();
+						} catch (IOException e2) {
+							// TODO Auto-generated catch block
+							e2.printStackTrace();
+						}
+					}
+				}
 		    }
 		};
 	}
@@ -80,6 +146,7 @@ public class HandlerAcoes {
 				StringSelection stringSelection = new StringSelection(editor.getConteudoSelecionado());
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 				clipboard.setContents(stringSelection, null);
+				
 			}
 		};
 	}
@@ -88,7 +155,25 @@ public class HandlerAcoes {
 		return new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Colar.");
+				Toolkit toolkit = Toolkit.getDefaultToolkit();
+				Clipboard clipboard = toolkit.getSystemClipboard();
+				
+				int posicao = editor.getEditorTexto().getCaretPosition();
+				String result;
+				
+				String texto = editor.getEditorTexto().getText();
+				
+				try {
+					result = (String) texto.substring(0, posicao) + clipboard.getData(DataFlavor.stringFlavor) + texto.substring(posicao, texto.length());
+					editor.getEditorTexto().setText(result);
+					editor.getEditorTexto().setCaretPosition(result.length() - texto.substring(posicao, texto.length()).length());
+				} catch (UnsupportedFlavorException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				
+				
 			}
 		};
 	}
@@ -118,7 +203,7 @@ public class HandlerAcoes {
 		return new AbstractAction() {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		        System.out.println("Mostrar equipe.");
+		        log.setText("Gustavo Kistner\n\nJoão Bragantino\n\nVinicius Martins");
 		    }
 		};
 	}
