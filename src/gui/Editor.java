@@ -1,5 +1,7 @@
 package gui;
 
+import java.awt.Font;
+
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
@@ -19,9 +21,10 @@ public class Editor extends JScrollPane {
 		setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 	}
 
-	public static Editor Inicializar() {
+	public static Editor Inicializar(Font fontePadrao) {
 		JTextArea textArea = new JTextArea();
 		textArea.setTabSize(1);
+		textArea.setFont(fontePadrao);
 
 		return new Editor(textArea);
 	}
@@ -52,6 +55,19 @@ public class Editor extends JScrollPane {
 		editorTexto.setText(primeiraParte + segundaParte);
 		
 		return conteudo.substring(start, end);
+	}
+	
+	public String substituirConteudoSelecionado(String conteudoColar) {
+		int start = editorTexto.getSelectionStart();
+		int end = editorTexto.getSelectionEnd();
+		
+		String conteudo = getConteudo();
+		String primeiraParte = conteudo.substring(0, start);
+		String segundaParte = conteudo.substring(end, conteudo.length());
+		editorTexto.setText(primeiraParte + conteudoColar + segundaParte);
+		
+		return conteudo.substring(start, end);
+
 	}
 	
 	public void limpar() {

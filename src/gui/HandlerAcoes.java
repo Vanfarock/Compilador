@@ -1,13 +1,11 @@
 package gui;
 
-import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -21,7 +19,6 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import java.awt.AWTException;
 import java.awt.Component;
 
 @SuppressWarnings("serial")
@@ -78,6 +75,7 @@ public class HandlerAcoes {
 		    	FileFilter filter = new FileNameExtensionFilter("Arquivo de texto (.txt)","txt");
 		    	Component c = null;
 		        JFileChooser fc = new JFileChooser();
+		        fc.setFileFilter(filter);
 		        fc.addChoosableFileFilter(filter);
 		        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		        
@@ -92,13 +90,9 @@ public class HandlerAcoes {
 						log.limpar();
 				        barraStatus.setText(f.getPath());
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-				} else{
-					
 				}
-		        	        
 		    }
 		};
 	}
@@ -116,6 +110,7 @@ public class HandlerAcoes {
 					FileFilter filter = new FileNameExtensionFilter("Arquivo de texto (.txt)","txt");
 					JFileChooser fc = new JFileChooser(new File("C:\\"));
 					fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+					fc.setFileFilter(filter);
 					fc.addChoosableFileFilter(filter);
 					fc.setDialogTitle("Salvar Arquivo");
 					int save = fc.showSaveDialog(null);
@@ -130,7 +125,6 @@ public class HandlerAcoes {
 							barraStatus.setText(f.getPath());
 							log.limpar();
 						} catch (IOException e2) {
-							// TODO Auto-generated catch block
 							e2.printStackTrace();
 						}
 					}
@@ -157,23 +151,26 @@ public class HandlerAcoes {
 			public void actionPerformed(ActionEvent e) {
 				Toolkit toolkit = Toolkit.getDefaultToolkit();
 				Clipboard clipboard = toolkit.getSystemClipboard();
-				
-				int posicao = editor.getEditorTexto().getCaretPosition();
-				String result;
-				
-				String texto = editor.getEditorTexto().getText();
-				
+				String conteudoColar;
 				try {
-					result = (String) texto.substring(0, posicao) + clipboard.getData(DataFlavor.stringFlavor) + texto.substring(posicao, texto.length());
-					editor.getEditorTexto().setText(result);
-					editor.getEditorTexto().setCaretPosition(result.length() - texto.substring(posicao, texto.length()).length());
+					conteudoColar = (String)clipboard.getData(DataFlavor.stringFlavor);
 				} catch (UnsupportedFlavorException | IOException e1) {
-					// TODO Auto-generated catch block
+					conteudoColar = "";
 					e1.printStackTrace();
 				}
 				
-				
-				
+				if (editor.getConteudoSelecionado().equals("")) {
+					int posicao = editor.getEditorTexto().getCaretPosition();
+					String result;
+					
+					String texto = editor.getEditorTexto().getText();
+					
+					result = (String) texto.substring(0, posicao) + conteudoColar + texto.substring(posicao, texto.length());
+					editor.getEditorTexto().setText(result);
+					editor.getEditorTexto().setCaretPosition(result.length() - texto.substring(posicao, texto.length()).length());					
+				} else {
+					editor.substituirConteudoSelecionado(conteudoColar);
+				}
 			}
 		};
 	}
@@ -194,7 +191,7 @@ public class HandlerAcoes {
 		return new AbstractAction() {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		        System.out.println("Compilar.");
+		    	log.setText("Compilação de programas ainda não foi implementada.");
 		    }
 		};
 	}

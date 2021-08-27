@@ -42,14 +42,14 @@ public class Interface {
 	}
 
 	private void initializeVariables() {
-		fontePadrao = new Font("Arial", 12, 12);
+		fontePadrao = new Font("Arial", 12, 14);
 		backgroundPadrao = new Color(240, 240, 240);
 	}
 
 	private void initialize() {
 		framePrincipal = new JFrame();
 		framePrincipal.setTitle("Compilador");
-//		framePrincipal.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		framePrincipal.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		framePrincipal.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		framePrincipal.setMinimumSize(new Dimension(1000, 700));
 		
@@ -84,7 +84,7 @@ public class Interface {
 		verticalSplit.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		horizontalSplit.setRightComponent(verticalSplit);
 		
-		Editor editor = Editor.Inicializar();
+		Editor editor = Editor.Inicializar(fontePadrao);
 		verticalSplit.setLeftComponent(editor);
 		
 		Log log = new Log(backgroundPadrao);
