@@ -20,6 +20,7 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import analisador.AnalisadorLexico;
 import gals.LexicalError;
 import gals.Lexico;
 import gals.Token;
@@ -196,16 +197,8 @@ public class HandlerAcoes {
 		return new AbstractAction() {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		    	   Lexico lexico = new Lexico();
-		    	   lexico.setInput( new StringReader(editor.getEditorTexto().getText()));
-		    	   try {
-			    	   Token t = null;
-			    	   while ( (t = lexico.nextToken()) != null ) {
-			    	     System.out.println(t.getLexeme()); 
-			    	   }
-		    	   } catch ( LexicalError e2 ) {  
-		    	     System.out.println(e2.getMessage() + " em " + e2.getPosition());
-		    	   }
+		    	  AnalisadorLexico anal = new AnalisadorLexico();
+		    	  anal.analisar(editor.getEditorTexto().getText());
 		    }
 		};
 	}
