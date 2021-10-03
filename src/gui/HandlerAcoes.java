@@ -11,19 +11,16 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.nio.file.Files;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
+import javax.swing.JTextArea;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import analisador.AnalisadorLexico;
-import gals.LexicalError;
-import gals.Lexico;
-import gals.Token;
+import analisador.lexico.AnalisadorLexico;
 
 import java.awt.Component;
 
@@ -197,8 +194,8 @@ public class HandlerAcoes {
 		return new AbstractAction() {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		    	  AnalisadorLexico anal = new AnalisadorLexico();
-		    	  anal.analisar(editor.getEditorTexto().getText());
+		    	String analise = AnalisadorLexico.analisar(editor.getEditorTexto().getText());
+		    	log.setText(analise);
 		    }
 		};
 	}

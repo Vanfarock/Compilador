@@ -6,7 +6,7 @@ public class Token
     private String lexeme;
     private int position;
 
-    public Token(int id, String lexeme, int position)
+	public Token(int id, String lexeme, int position)
     {
         this.id = id;
         this.lexeme = lexeme;
