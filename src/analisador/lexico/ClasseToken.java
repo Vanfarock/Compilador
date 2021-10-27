@@ -4,10 +4,10 @@ public class ClasseToken {
 	public static String porExtenso(int id) {
 		switch (id) {
 			case 2: return "palavra reservada";			
-			case 3: return "identificador int";
-			case 4: return "identificador float";
-			case 5: return "identificador string";
-			case 6: return "identificador bool";
+			case 3: return "identificador";
+			case 4: return "identificador";
+			case 5: return "identificador";
+			case 6: return "identificador";
 			case 7: return "constante int";
 			case 8: return "constante float";
 			case 9: return "constante string";

@@ -1,4 +1,4 @@
-package gals;
+package gals.lexico;
 
 @SuppressWarnings("serial")
 public class LexicalError extends AnalysisError
@@ -15,6 +15,11 @@ public class LexicalError extends AnalysisError
     {
         super(msg);
     }
+
+
+	public LexicalError(String string, int start) {
+		super(string, start);
+	}
 
 	public String getPalavra() {
 		return palavra;

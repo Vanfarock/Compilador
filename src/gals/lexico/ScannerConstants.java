@@ -1,4 +1,4 @@
-package gals;
+package gals.lexico;
 
 public interface ScannerConstants
 {

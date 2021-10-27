@@ -11,16 +11,22 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.nio.file.Files;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
-import javax.swing.JTextArea;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import analisador.lexico.AnalisadorLexico;
+import gals.lexico.LexicalError;
+import gals.lexico.Lexico;
+import gals.lexico.SemanticError;
+import gals.lexico.Semantico;
+import gals.lexico.SyntaticError;
+import gals.sintatico.Sintatico;
 
 import java.awt.Component;
 
@@ -194,8 +200,29 @@ public class HandlerAcoes {
 		return new AbstractAction() {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		    	String analise = AnalisadorLexico.analisar(editor.getEditorTexto().getText());
-		    	log.setText(analise);
+	
+		 	   Lexico lexico = new Lexico();
+		  	   Sintatico sintatico = new Sintatico();
+		  	   Semantico semantico = new Semantico();
+		    
+		  	   lexico.setInput(new StringReader(editor.getEditorTexto().getText()));
+		  	   try {
+		  		   String analisar = AnalisadorLexico.analisar(editor.getEditorTexto().getText());
+		  		  	
+		  		  log.setText(analisar);
+		  		   
+		  		  sintatico.parse(lexico, semantico);
+		    		
+		    	} catch (LexicalError ex) {
+					log.setText(ex.getMessage());
+					
+				} catch (SyntaticError e2) {
+					log.setText(e2.getMessage());
+				} catch (SemanticError e3) {
+					log.setText(e3.getMessage());
+
+				}
+		  	   
 		    }
 		};
 	}

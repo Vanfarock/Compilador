@@ -1,4 +1,5 @@
-package gals;
+package gals.lexico;
+import gals.sintatico.Constants;
 
 public class Lexico implements Constants
 {
@@ -53,13 +54,10 @@ public class Lexico implements Constants
         int endState = -1;
         int end = -1;
 
-        String palavra = "";
         while (hasInput())
         {
             lastState = state;
-            char nextChar = nextChar();
-            palavra += nextChar;
-            state = nextState(nextChar, state);
+            state = nextState(nextChar(), state);
 
             if (state < 0)
                 break;
@@ -73,9 +71,8 @@ public class Lexico implements Constants
                 }
             }
         }
-        if (endState < 0 || (endState != state && tokenForState(lastState) == -2)) {
-        	throw new LexicalError(SCANNER_ERROR[lastState], start, palavra);
-        }
+        if (endState < 0 || (endState != state && tokenForState(lastState) == -2))
+            throw new LexicalError(SCANNER_ERROR[lastState], start);
 
         position = end;
 

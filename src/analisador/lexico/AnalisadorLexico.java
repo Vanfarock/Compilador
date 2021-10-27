@@ -6,14 +6,14 @@ import java.util.Arrays;
 import java.util.Formatter;
 import java.util.List;
 
-import gals.LexicalError;
-import gals.Lexico;
-import gals.ScannerConstants;
-import gals.Token;
+import gals.lexico.LexicalError;
+import gals.lexico.Lexico;
+import gals.lexico.ScannerConstants;
+import gals.lexico.Token;
 
 public class AnalisadorLexico {
 	
-	public static String analisar(String text) {		
+	public static String analisar(String text) throws LexicalError {		
 	   Lexico lexico = new Lexico();
   	   lexico.setInput(new StringReader(text));
   	   
@@ -43,7 +43,7 @@ public class AnalisadorLexico {
 		   }
 		   return analise.toString() + "\r\nPrograma compilado com sucesso!";
   	   } catch (LexicalError ex) {
-  		   return "Erro na linha " + getLinha(text, ex.getPosition()) + " - " + ex.getMessage().replace("{lexema}", ex.getPalavra());
+  		  throw new LexicalError("Erro na linha " + getLinha(text, ex.getPosition()) + " - " + ex.getMessage().replace("{lexema}", ex.getPalavra()));
   	   }
 	}
 	

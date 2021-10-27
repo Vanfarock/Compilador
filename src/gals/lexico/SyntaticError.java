@@ -1,5 +1,4 @@
-package gals;
-
+package gals.lexico;
 public class SyntaticError extends AnalysisError
 {
     public SyntaticError(String msg, int position)
