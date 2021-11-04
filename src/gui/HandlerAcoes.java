@@ -207,11 +207,11 @@ public class HandlerAcoes {
 		    
 		  	   lexico.setInput(new StringReader(editor.getEditorTexto().getText()));
 		  	   try {
-		  		   String analisar = AnalisadorLexico.analisar(editor.getEditorTexto().getText());
-		  		  	
-		  		  log.setText(analisar);
+		  		   AnalisadorLexico.analisar(editor.getEditorTexto().getText());
 		  		   
 		  		  sintatico.parse(lexico, semantico);
+		  		  
+		  		  log.setText("Programa compilado com sucesso.");
 		    		
 		    	} catch (LexicalError ex) {
 					log.setText(ex.getMessage());
