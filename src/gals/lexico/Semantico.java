@@ -41,8 +41,13 @@ public class Semantico implements Constants
     		case 4: acao04(); break;
     		case 5: acao05(token); break;
     		case 6: acao06(token); break;
+    		case 7: acao07(); break;
+    		case 8: acao08(); break;
+    		case 9: acao09(token); break;
+    		case 10: acao10(); break;
     		case 11: acao11(); break;
     		case 12: acao12(); break;
+    		case 13: acao13(); break;
     		case 14: acao14(); break;
     		case 15: acao15(); break;
     		case 16: acao16(); break;
