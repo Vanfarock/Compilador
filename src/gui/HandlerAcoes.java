@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.nio.file.Files;
+import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -35,6 +36,7 @@ public class HandlerAcoes {
 	private BarraStatus barraStatus;
 	private Log log;
 	private Editor editor;
+	private String caminhoArquivo;
 
 	public HandlerAcoes(BarraStatus barraStatus, Log log, Editor editor) {
 		setBarraStatus(barraStatus);
@@ -73,6 +75,7 @@ public class HandlerAcoes {
 		    	editor.limpar();
 		    	log.limpar();
 		    	barraStatus.limpar();
+		    	caminhoArquivo = "";
 		    }
 		};
 	}
@@ -94,8 +97,9 @@ public class HandlerAcoes {
 		        if(n == JFileChooser.APPROVE_OPTION) {
 					String dados;
 					try {
+						caminhoArquivo = f.getAbsolutePath();
 						dados = new String(Files.readAllBytes(f.toPath()));
-						editor.getEditorTexto().setText(dados);
+						editor.getEditorTexto().setText(dados.substring(0, dados.length() - 2));
 						log.limpar();
 				        barraStatus.setText(f.getPath());
 					} catch (IOException e1) {
@@ -110,37 +114,63 @@ public class HandlerAcoes {
 		return new AbstractAction() {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		    	File f = new File(barraStatus.getText());
-		    	try {
-					PrintWriter pw = new PrintWriter(f);
-					pw.println(editor.getEditorTexto().getText());
-					pw.close();
-				} catch (FileNotFoundException e1) {
-					FileFilter filter = new FileNameExtensionFilter("Arquivo de texto (.txt)","txt");
-					JFileChooser fc = new JFileChooser(new File("C:\\"));
-					fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-					fc.setFileFilter(filter);
-					fc.addChoosableFileFilter(filter);
-					fc.setDialogTitle("Salvar Arquivo");
-					int save = fc.showSaveDialog(null);
-					if (save == JFileChooser.APPROVE_OPTION) {
-						String conteudo = editor.getConteudo();
-						f = fc.getSelectedFile();
-						try {
-							FileWriter fw = new FileWriter(f.getPath()+".txt");
-							fw.write(conteudo);
-							fw.flush();
-							fw.close();
-							barraStatus.setText(f.getPath());
-							log.limpar();
-						} catch (IOException e2) {
-							e2.printStackTrace();
-						}
-					}
-				}
-		    }
+	    		salvarCodigo();
+	    	}
 		};
 	}
+	
+	private void salvarCodigo() {
+		salvarArquivoInterno(barraStatus.getText(), editor.getEditorTexto().getText(), ".txt");
+	}
+	
+	private void salvarArquivoInterno(String path, String conteudo, String extensao) {
+		File f;
+		path = removerExtensaoDoPath(path);
+		
+		if (path.isBlank()) {
+			f = new File(path);
+		} else {
+			f = new File(path + extensao);
+		}
+    	try {    		
+			PrintWriter pw = new PrintWriter(f);
+			pw.println(conteudo);
+			pw.close();
+		} catch (FileNotFoundException e1) {
+			FileFilter filter = new FileNameExtensionFilter("Arquivo de texto (.txt)","txt");
+			JFileChooser fc = new JFileChooser(new File("C:\\"));
+			fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			fc.setFileFilter(filter);
+			fc.addChoosableFileFilter(filter);
+			fc.setDialogTitle("Salvar Arquivo");
+			int save = fc.showSaveDialog(null);
+			if (save == JFileChooser.APPROVE_OPTION) {
+				conteudo = editor.getConteudo();
+				f = fc.getSelectedFile();
+				try {
+					caminhoArquivo = f.getAbsolutePath();
+					
+					FileWriter fw = new FileWriter(f.getPath() + extensao);
+					fw.write(conteudo);
+					fw.flush();
+					fw.close();
+					barraStatus.setText(f.getPath());
+					log.limpar();
+				} catch (IOException e2) {
+					e2.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	private String removerExtensaoDoPath(String path) {
+		if (path == null) return null;
+
+        int ultimoPonto = path.lastIndexOf(".");
+        if (ultimoPonto == -1) return path;
+
+        return path.substring(0, ultimoPonto);
+    }
 	
 	public Action copiar() {
 		return new AbstractAction() {
@@ -207,24 +237,37 @@ public class HandlerAcoes {
 		    
 		  	   lexico.setInput(new StringReader(editor.getEditorTexto().getText()));
 		  	   try {
-		  		   AnalisadorLexico.analisar(editor.getEditorTexto().getText());
+			    	salvarCodigo();
 		  		   
-		  		  sintatico.parse(lexico, semantico);
-		  		  
+		  		   AnalisadorLexico.analisar(editor.getEditorTexto().getText());
+		  		   sintatico.parse(lexico, semantico);
+
+		  		   salvarCodigoGerado(semantico.getCodigo());
+		  		   
 		  		  log.setText("Programa compilado com sucesso.");
-		    		
 		    	} catch (LexicalError ex) {
 					log.setText(ex.getMessage());
-					
 				} catch (SyntaticError e2) {
 					log.setText(e2.getMessage());
 				} catch (SemanticError e3) {
 					log.setText(e3.getMessage());
-
 				}
-		  	   
 		    }
 		};
+	}
+	
+	private void salvarCodigoGerado(ArrayList<String> codigo) {
+		if (caminhoArquivo.isEmpty()) {
+			log.setText("Não foi possível salvar o código gerado, tentar novamente.");
+			return;
+		}
+		
+		String codigoGerado = "";
+		for (String linha : codigo) {
+			codigoGerado += linha + "\r\n";
+		}
+		
+		salvarArquivoInterno(caminhoArquivo, codigoGerado, ".il");
 	}
 	
 	public Action mostrarEquipe() {
