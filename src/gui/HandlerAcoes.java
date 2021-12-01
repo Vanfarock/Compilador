@@ -250,6 +250,7 @@ public class HandlerAcoes {
 				} catch (SyntaticError e2) {
 					log.setText(e2.getMessage());
 				} catch (SemanticError e3) {
+					System.out.println(e3.getMessage());
 					log.setText(e3.getMessage());
 				}
 		    }

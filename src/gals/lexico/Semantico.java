@@ -27,6 +27,8 @@ public class Semantico implements Constants
 	private String operador;
 	private ArrayList<String> codigo = new ArrayList<String>();
 	private Stack<TipoEnum> pilhaTipos = new Stack<TipoEnum>();
+	private ArrayList<String> listaId = new ArrayList<String>();
+	private Stack<String> pilhaRotulos = new Stack<String>();
 	
 	public ArrayList<String> getCodigo() {
     	return codigo;
@@ -55,9 +57,21 @@ public class Semantico implements Constants
     		case 18: acao18(); break;
     		case 19: acao19(); break;
     		case 20: acao20(); break;
+    		case 21: acao21(); break;
+    		case 22: acao22(); break;
+    		case 23: acao23(token); break;
+    		case 24: acao24(token); break;
+    		case 25: acao25(); break;
+    		case 26: acao26(); break;
+    		case 27: acao27(); break;
+    		case 28: acao28(); break;
+    		case 29: acao29(); break;
+    		case 30: acao30(); break;
+    		case 31: acao31(); break;
+    		case 32: acao32(); break;
+    		case 33: acao33(); break;
+    		case 34: acao34(token); break;
     	}
-    	
-        System.out.println("Ação #"+action+", Token: "+token);
     }
     
     private void acao01() throws SemanticError {
@@ -173,16 +187,21 @@ public class Semantico implements Constants
     	TipoEnum tipo1 = pilhaTipos.pop();
     	TipoEnum tipo2 = pilhaTipos.pop();
     	
-    	if (tipo1 == tipo2) {
-    		pilhaTipos.push(TipoEnum.Bool);
-    	} else {
+    	if (tipo1 != tipo2) {
     		throw new SemanticError("Tipo(s) incompatível(is) em expressão lógica.");
     	}
+    	
+    	pilhaTipos.push(TipoEnum.Bool);
     	
     	switch (operador) {
 	    	case ">": codigo.add("cgt"); break;
 	    	case "<": codigo.add("clt"); break;
 	    	case "==": codigo.add("ceq"); break;
+	    	case "<>":
+	    		codigo.add("ceq");
+	    		codigo.add("ldc.i4.0");
+	    		codigo.add("ceq");
+	    		break;
     	}
     }
     
@@ -249,5 +268,122 @@ public class Semantico implements Constants
     private void acao20() {
     	pilhaTipos.push(TipoEnum.String);
 		codigo.add("ldstr " + "\"\\t\"");
+    }
+    
+    private void acao21() throws SemanticError {
+    	TipoEnum tipo1 = pilhaTipos.pop();
+    	TipoEnum tipo2 = pilhaTipos.pop();
+    	
+    	if (tipo1 != TipoEnum.Bool || tipo2 != TipoEnum.Bool ) {
+    		throw new SemanticError("Tipo(s) incompatível(is) em expressão lógica.");
+    	}
+		
+    	pilhaTipos.push(TipoEnum.Bool);
+    	codigo.add("and");
+    }
+    
+    private void acao22() throws SemanticError {
+    	TipoEnum tipo1 = pilhaTipos.pop();
+    	TipoEnum tipo2 = pilhaTipos.pop();
+    	
+    	if (tipo1 != TipoEnum.Bool || tipo2 != TipoEnum.Bool ) {
+    		throw new SemanticError("Tipo(s) incompatível(is) em expressão lógica.");
+    	}
+		
+    	pilhaTipos.push(TipoEnum.Bool);
+    	codigo.add("or");
+    }
+    
+    private void acao23(Token token) {
+    	for (String id : listaId) {
+    		codigo.add(".locals (" + obterTipoIdentificador(id) + " " + id + ")");
+    	}
+    	listaId.clear();
+    }
+    
+    private void acao24(Token token) {
+    	listaId.add(token.getLexeme());
+    }
+    
+    private void acao25() {
+    	String id = listaId.get(listaId.size() - 1);
+    	TipoEnum tipo = obterTipoIdentificador(id);
+    	
+    	if (tipo == TipoEnum.Int) {
+    		codigo.add("conv.i8");
+    	}
+    	
+    	codigo.add("stloc " + id);
+    }
+    
+    private void acao26() throws SemanticError {
+    	TipoEnum tipo = pilhaTipos.pop();
+    	String rotulo = pilhaRotulos.pop();
+    	
+    	if (tipo == TipoEnum.Bool) {
+    		throw new SemanticError("Tipo(s) incompatível(is) em expressão lógica.");
+    	}
+    	
+    	codigo.add("brfalse " + rotulo);
+    }
+    
+    private void acao27() {
+    	for (String id : listaId) {
+    		TipoEnum tipoId = obterTipoIdentificador(id);
+    		if (tipoId == null) continue;
+    		
+    		codigo.add("call string [mscorlib]System.Console::ReadLine()");
+    		
+    		if (tipoId == TipoEnum.Int) {
+    			codigo.add("call " + tipoId + " [mscorlib]System.Int64::Parse(string)");
+    		} else if (tipoId == TipoEnum.Float) {
+    			codigo.add("call " + tipoId + " [mscorlib]System.Double::Parse(string)");
+    		} else if (tipoId == TipoEnum.Bool) {
+    			codigo.add("call " + tipoId + " [mscorlib]System.Boolean::Parse(string)");
+    		}
+    		
+    		codigo.add("stloc " + id);
+    	}
+    	listaId.clear();
+    }
+    
+    private void acao28() {
+    }
+    
+    private void acao29() {
+    }
+    
+    private void acao30() {
+    }
+    
+    private void acao31() {
+    }
+    
+    private void acao32() {
+    }
+    
+    private void acao33() {
+    }
+    
+    private void acao34(Token token) {
+    	String id = token.getLexeme();
+    	codigo.add("ldloc " + id);
+    	
+    	TipoEnum tipo = obterTipoIdentificador(id);
+    	if (tipo == null) return;
+    	
+    	pilhaTipos.push(tipo);
+    	
+    	if (tipo == TipoEnum.Int) {
+    		codigo.add("conv.r8");    		
+    	}
+    }
+    
+    private TipoEnum obterTipoIdentificador(String id) {
+    	if (id.startsWith("I")) return TipoEnum.Int;
+    	if (id.startsWith("F")) return TipoEnum.Float;
+    	if (id.startsWith("S")) return TipoEnum.String;
+    	if (id.startsWith("B")) return TipoEnum.Bool;
+    	return null;
     }
 }
