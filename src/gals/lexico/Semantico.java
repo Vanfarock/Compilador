@@ -29,6 +29,7 @@ public class Semantico implements Constants
 	private Stack<TipoEnum> pilhaTipos = new Stack<TipoEnum>();
 	private ArrayList<String> listaId = new ArrayList<String>();
 	private Stack<String> pilhaRotulos = new Stack<String>();
+	private int ultimoRotulo = 1;
 	
 	public ArrayList<String> getCodigo() {
     	return codigo;
@@ -68,7 +69,7 @@ public class Semantico implements Constants
     		case 29: acao29(); break;
     		case 30: acao30(); break;
     		case 31: acao31(); break;
-    		case 32: acao32(); break;
+    		case 32: acao32(token); break;
     		case 33: acao33(); break;
     		case 34: acao34(token); break;
     	}
@@ -306,7 +307,7 @@ public class Semantico implements Constants
     }
     
     private void acao25() {
-    	String id = listaId.get(listaId.size() - 1);
+    	String id = listaId.remove(listaId.size() - 1);
     	TipoEnum tipo = obterTipoIdentificador(id);
     	
     	if (tipo == TipoEnum.Int) {
@@ -348,21 +349,61 @@ public class Semantico implements Constants
     }
     
     private void acao28() {
+    	String rotulo = montarRotulo(ultimoRotulo);
+    	ultimoRotulo++;    	
+    	
+    	codigo.add("brfalse " + rotulo);
+
+    	pilhaRotulos.push(rotulo);
     }
     
     private void acao29() {
+    	codigo.add(pilhaRotulos.pop() + ":");
     }
     
     private void acao30() {
+    	String rotulo = montarRotulo(ultimoRotulo);
+    	ultimoRotulo++;
+    	
+    	codigo.add("br " + rotulo);
+    	codigo.add(pilhaRotulos.pop() + ":");
+    	
+    	pilhaRotulos.push(rotulo);
     }
     
     private void acao31() {
+    	String rotulo = montarRotulo(ultimoRotulo);
+    	ultimoRotulo++;
+    	
+    	codigo.add(rotulo + ":");
+    	
+    	pilhaRotulos.push(rotulo);
     }
     
-    private void acao32() {
+    private void acao32(Token token) {
+    	String rotulo = montarRotulo(ultimoRotulo);
+    	ultimoRotulo++;
+
+    	String alternativa = "";
+    	
+    	String lexeme = token.getLexeme();
+    	if (lexeme.equals("isTrueDo")) {
+    		alternativa = "brfalse ";
+    	} else if (lexeme.equals("isFalseDo")) {
+    		alternativa = "brtrue ";
+    	}
+    	
+    	codigo.add(alternativa + rotulo);
+    	
+    	pilhaRotulos.push(rotulo);
     }
     
     private void acao33() {
+    	String rotulo1 = pilhaRotulos.pop();
+    	String rotulo2 = pilhaRotulos.pop();
+    	
+    	codigo.add("br " + rotulo2);
+    	codigo.add(rotulo1 + ":");
     }
     
     private void acao34(Token token) {
@@ -377,6 +418,10 @@ public class Semantico implements Constants
     	if (tipo == TipoEnum.Int) {
     		codigo.add("conv.r8");    		
     	}
+    }
+    
+    private String montarRotulo(int num) {
+    	return "r" + num;
     }
     
     private TipoEnum obterTipoIdentificador(String id) {
